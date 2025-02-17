@@ -12,11 +12,16 @@ class Parrilla extends StatefulWidget {
 
 class _ParrillaState extends State<Parrilla> {
   @override
+  int? clicked=0, preclicked=-1;
+  bool? flag=false;
   void initState() {
     // TODO: implement initState
     super.initState();
+    cartas = [];
+    initialState=[];
     inicializar(widget.nivel!);
   }
+
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
@@ -26,9 +31,35 @@ class _ParrillaState extends State<Parrilla> {
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
       itemBuilder: (context, index) => FlipCard(
           direction: FlipDirection.HORIZONTAL,
-          autoFlipDuration: const Duration(milliseconds: 500),
-          front: Image.asset(cartas[index]),
-          back: Image.asset("./images/reverso.png")),
+          onFlip: () {
+            if(!flag!){
+              preclicked=index;
+              clicked=0;
+              flag=true;
+            }else{
+              clicked=index;
+              flag=false;
+            }
+            if(preclicked!=clicked){
+              //Volteear las cartas
+            }
+            if(cartas.elementAt(clicked!)==cartas.elementAt(preclicked!)){
+              debugPrint("Clicked: son iguales");
+            }else{
+              Future.delayed(Duration(seconds: 1),() {
+                controllers[clicked!].controller?.toggle();
+                controllers[preclicked!].controller?.toggle();
+              },);
+            }
+            debugPrint("Clicked: $preclicked");
+            debugPrint("Clicked: $clicked");
+          },
+          fill: Fill.fillBack,
+          flipOnTouch: true,
+          controller: controllers[index],
+          //autoFlipDuration: const Duration(milliseconds: 500),
+          back: Image.asset(cartas[index]),
+          front: Image.asset("./images/reverso.png")),
     );
   }
 }
