@@ -72,13 +72,13 @@ void inicializar(Nivel nivel){
   int size=0;
   switch(nivel){
     case Nivel.facil:
-      size=10;
+      size=12;
       break;
     case Nivel.imposible:
       size=40;
       break;
     case Nivel.dificil:
-      size=30;
+      size=32;
       break;
     case Nivel.medio:
       size=20;
@@ -89,4 +89,6 @@ void inicializar(Nivel nivel){
     cartas.add(cards()[i]);
     controllers.add(FlipCardController());
   }
+  cartas.shuffle();
+  cartas.shuffle();
 }

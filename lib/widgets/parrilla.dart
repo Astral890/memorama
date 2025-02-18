@@ -12,13 +12,13 @@ class Parrilla extends StatefulWidget {
 
 class _ParrillaState extends State<Parrilla> {
   @override
-  int? clicked=0, preclicked=-1;
-  bool? flag=false;
+  int? preclicked = -1;
+  bool? flag = false, habilitado=true;
   void initState() {
     // TODO: implement initState
     super.initState();
     cartas = [];
-    initialState=[];
+    initialState = [];
     inicializar(widget.nivel!);
   }
 
@@ -28,34 +28,48 @@ class _ParrillaState extends State<Parrilla> {
       itemCount: cartas.length,
       shrinkWrap: true,
       gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
       itemBuilder: (context, index) => FlipCard(
           direction: FlipDirection.HORIZONTAL,
           onFlip: () {
-            if(!flag!){
-              preclicked=index;
-              clicked=0;
-              flag=true;
-            }else{
-              clicked=index;
-              flag=false;
+            if (!flag!) {
+              preclicked = index;
+              flag = true;
+            } else {
+              flag = false;
+              setState(() {
+                habilitado=false;
+              });
             }
-            if(preclicked!=clicked){
-              //Volteear las cartas
+            if (preclicked != index) {
+              setState(() {
+                habilitado=false;
+              });
+              if (cartas.elementAt(index) == cartas.elementAt(preclicked!)) {
+                debugPrint("Son iguales");
+                setState(() {
+                  initialState[preclicked!] = false;
+                  initialState[index] = false;
+                  habilitado=true;
+                },);
+              } else {
+                Future.delayed(
+                  Duration(milliseconds: 1000),
+                  () {
+                    controllers.elementAt(preclicked!).toggleCard();
+                    preclicked = index;
+                    controllers.elementAt(index).toggleCard();
+                    setState(() {
+                      habilitado=true;
+                    });
+                  },
+                );
+              }
             }
-            if(cartas.elementAt(clicked!)==cartas.elementAt(preclicked!)){
-              debugPrint("Clicked: son iguales");
-            }else{
-              Future.delayed(Duration(seconds: 1),() {
-                controllers[clicked!].controller?.toggle();
-                controllers[preclicked!].controller?.toggle();
-              },);
-            }
-            debugPrint("Clicked: $preclicked");
-            debugPrint("Clicked: $clicked");
+            //Future.delayed(Duration(milliseconds: 200));
           },
           fill: Fill.fillBack,
-          flipOnTouch: true,
+          flipOnTouch: habilitado!? initialState[index]:false,
           controller: controllers[index],
           //autoFlipDuration: const Duration(milliseconds: 500),
           back: Image.asset(cartas[index]),
